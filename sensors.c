@@ -2,8 +2,6 @@
 #include <wiringPi.h>
 #include <unistd.h>
 
-// ★ GPIO 번호 (BCM) 정의 ★
-// 핀맵 그림에 적힌 "GPIO xx" 숫자를 그대로 씁니다.
 #define TRIG_LEFT   4
 #define ECHO_LEFT   17
 
