@@ -2,7 +2,7 @@
 #include <wiringPi.h>
 #include <unistd.h>
 
-#define TRIG_LEFT   4
+#define TRIG_LEFT   18
 #define ECHO_LEFT   17
 
 #define TRIG_CENTER 22
