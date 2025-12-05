@@ -8,7 +8,8 @@
 #define BAUD_RATE 115200
 
 // 타임아웃 설정 (밀리초 단위, 예: 500ms = 0.5초)
-// 0.5초 동안 블루투스 신호가 없으면 정지합니다.
+// 0.5초 동안 블루투스 신호가 없으면 정지합니다. 4번 5번에 꼽혀있음
+
 #define SAFETY_TIMEOUT_MS 250 
 
 static const char *UART2_DEV = "/dev/ttyAMA2"; 
