@@ -3,10 +3,18 @@
 #include <wiringPi.h>
 // 🚨 수정: #include "bluetooth.c" 대신 헤더 파일 포함
 #include "bluetooth.h" 
+#include "sensors.h"
 
 // 공유 변수 정의 (다른 파일에서 extern으로 참조함)
+// 1. 모터 제어 변수
 int MOTOR_MOVEMENT;
 int MOTOR_POWER;
+
+// 2. 센서 거리 변수
+float SHARED_DIST_LEFT;
+float SHARED_DIST_CENTER;
+float SHARED_DIST_RIGHT;
+float SHARED_DIST_HYPOTENUSE;
 
 // 뮤텍스 정의
 pthread_mutex_t shared_lock = PTHREAD_MUTEX_INITIALIZER; 
