@@ -1,66 +1,70 @@
+// sensors.c
 #include <stdio.h>
 #include <wiringPi.h>
 #include <unistd.h>
+#include <pthread.h>
+#include <math.h>
+#include "sensors.h"
 
-#define TRIG_LEFT   4
-#define ECHO_LEFT   17
+// 뮤텍스 초기화
+pthread_mutex_t sensor_lock = PTHREAD_MUTEX_INITIALIZER;
 
-#define TRIG_CENTER 22
-#define ECHO_CENTER 27
-
-#define TRIG_RIGHT  9
-#define ECHO_RIGHT  10
-
-float getDistance(int trigPin, int echoPin) {
+// 내부 거리 계산 함수 (외부로 노출 안 함)
+float measure_distance(int trigPin, int echoPin) {
     long startTime, endTime;
-    float distance;
-
+    
     digitalWrite(trigPin, LOW);
     delayMicroseconds(2);
     digitalWrite(trigPin, HIGH);
     delayMicroseconds(10);
     digitalWrite(trigPin, LOW);
 
-    // 타임아웃 추가 (무한대기 방지)
     int timeout = 30000; 
     while(digitalRead(echoPin) == LOW) {
-        if(timeout-- <= 0) return -1;
+        if(timeout-- <= 0) return -1.0;
     }
     startTime = micros();
 
     timeout = 30000;
     while(digitalRead(echoPin) == HIGH) {
-        if(timeout-- <= 0) return -1;
+        if(timeout-- <= 0) return -1.0;
     }
     endTime = micros();
 
-    distance = (endTime - startTime) / 58.0;
-    return distance;
+    return (endTime - startTime) / 58.0;
 }
 
-int main(void) {
-    // ★ 여기서 GPIO 모드로 초기화합니다 ★
-    if (wiringPiSetupGpio() == -1) return 1;
+// 2. 센서 스레드 (백그라운드에서 계속 값 갱신)
+void *sensor_thread(void *arg) {
+    // 핀 설정
+    if (wiringPiSetupGpio() == -1) return NULL; // 이미 메인에서 했으면 생략 가능하지만 안전상
 
-    // 핀 모드 설정
     pinMode(TRIG_LEFT, OUTPUT);   pinMode(ECHO_LEFT, INPUT);
     pinMode(TRIG_CENTER, OUTPUT); pinMode(ECHO_CENTER, INPUT);
     pinMode(TRIG_RIGHT, OUTPUT);  pinMode(ECHO_RIGHT, INPUT);
     
-    // 초기화
     digitalWrite(TRIG_LEFT, LOW);
     digitalWrite(TRIG_CENTER, LOW);
     digitalWrite(TRIG_RIGHT, LOW);
 
-    printf("로봇 청소기 센서 테스트 (GPIO 모드)\n");
+    printf("Sensor Thread Started...\n");
 
     while(1) {
-        printf("좌: %.1fcm | 중: %.1fcm | 우: %.1fcm\n",
-            getDistance(TRIG_LEFT, ECHO_LEFT),
-            getDistance(TRIG_CENTER, ECHO_CENTER),
-            getDistance(TRIG_RIGHT, ECHO_RIGHT)
-        );
-        delay(100); // 0.1초 대기
+        float l = measure_distance(TRIG_LEFT, ECHO_LEFT);
+        float c = measure_distance(TRIG_CENTER, ECHO_CENTER);
+        float r = measure_distance(TRIG_RIGHT, ECHO_RIGHT);
+        float hypotenuse = sqrt((15.0 + l) * (15.0 + l) + (15.0 + r) * (15.0 + r)); // 빗변 거리 측정, 작아질 수록 사선으로 가까워짐
+        // ★ 공유 변수 업데이트 (쓰기)
+        // main에서 읽는 도중에 값이 바뀌면 꼬일 수 있으니 lock을 겁니다.
+        pthread_mutex_lock(&sensor_lock);
+        SHARED_DIST_LEFT = l;
+        SHARED_DIST_CENTER = c;
+        SHARED_DIST_RIGHT = r;
+        SHARED_DIST_HYPOTENUSE = hypotenuse;
+        pthread_mutex_unlock(&sensor_lock);
+
+        // 너무 자주 측정하면 CPU 부하가 심하니 0.1초 쉼
+        delay(100);
     }
-    return 0;
+    return NULL;
 }
