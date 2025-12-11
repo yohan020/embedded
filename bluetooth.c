@@ -95,9 +95,15 @@ void *bluetooth(void *arg) {
                     break;
                 case '5':
                     printf("[CMD 5] Auto Mode\n");
+                    pthread_mutex_lock(&shared_lock);
+                    AUTO_MODE = 1;
+                    pthread_mutex_unlock(&shared_lock);
                     break;
                 case '6':
                     printf("[CMD 6] Manual Mode\n");
+                    pthread_mutex_lock(&shared_lock);
+                    AUTO_MODE = 0;
+                    pthread_mutex_unlock(&shared_lock);
                     break;
                 case '\r': 
                 case '\n': 

@@ -9,6 +9,7 @@
 // 1. 모터 제어 변수
 int MOTOR_MOVEMENT;
 int MOTOR_POWER;
+int AUTO_MODE; // 0 : 수동, 1 : 자동
 
 // 2. 센서 거리 변수
 float SHARED_DIST_LEFT;
