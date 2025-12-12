@@ -40,10 +40,12 @@ void *bluetooth(void *arg) {
     // ★ 추가: 마지막 데이터 수신 시간을 기록할 변수
     unsigned int last_received_time; 
 
+    /*
     if (wiringPiSetupGpio() < 0) {
         perror("wiringPiSetupGpio failed");
         return (void *)-1;
     }
+    */
 
     if ((fd_serial = serialOpen(UART2_DEV, BAUD_RATE)) < 0) {
         printf("Unable to open serial device (%s).\n", UART2_DEV);
@@ -103,6 +105,7 @@ void *bluetooth(void *arg) {
                     printf("[CMD 6] Manual Mode\n");
                     pthread_mutex_lock(&shared_lock);
                     AUTO_MODE = 0;
+                    MOTOR_MOVEMENT = 0; // 수동 전환 시 정지 후 시작
                     pthread_mutex_unlock(&shared_lock);
                     break;
                 case '\r': 
@@ -121,16 +124,22 @@ void *bluetooth(void *arg) {
             // ★ 추가: 데이터가 수신되지 않을 때 타임아웃 체크
             // (현재 시간 - 마지막 수신 시간)이 설정된 타임아웃보다 크면
             if (millis() - last_received_time > SAFETY_TIMEOUT_MS) {
-                
-                // 불필요한 Mutex 잠금을 막기 위해 현재 상태가 0이 아닐 때만 실행
-                if (MOTOR_MOVEMENT != 0) {
+                int motor_movement;
+                int auto_mode;
+                pthread_mutex_lock(&shared_lock);
+                motor_movement = MOTOR_MOVEMENT;
+                auto_mode = AUTO_MODE;
+                pthread_mutex_unlock(&shared_lock);
+                // 자동모드일 때는 타임아웃 스킵 (navigation이 제어함)
+                // 수동모드일 때만 안전 정지 적용
+                if (auto_mode == 0 && motor_movement != 0) {
                     printf("[Safety] No signal for %dms. Auto-Stop!\n", SAFETY_TIMEOUT_MS);
                     pthread_mutex_lock(&shared_lock);
                     MOTOR_MOVEMENT = 0; // 강제 정지
                     pthread_mutex_unlock(&shared_lock);
                     fflush(stdout);
                 }
-                
+                last_received_time = millis();
                 // 타임아웃이 계속 발생할 때 last_received_time을 계속 갱신할지,
                 // 아니면 한 번 멈추고 다음 데이터가 올 때까지 기다릴지는 선택 사항입니다.
                 // 여기서는 다음 데이터가 올 때까지 기다리는 구조입니다.

@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <wiringPi.h>
-#include <softPwm.h> // 소프트웨어 PWM 라이브러리 추가
+#include "motors.h"
 
 // 커밋 테스트
 
@@ -55,7 +54,7 @@ void stop_Moving() {
     softPwmWrite(LEFT_MOTOR_PIN2, 0);
     softPwmWrite(RIGHT_MOTOR_PIN1, 0);
     softPwmWrite(RIGHT_MOTOR_PIN2, 0);
-    printf("[Action] Stop Moving\n");
+    //printf("[Action] Stop Moving\n");
 }
 
 // 전진
@@ -66,35 +65,33 @@ void move_Forward() {
     // 오른쪽 전진
     softPwmWrite(RIGHT_MOTOR_PIN1, SPEED_MOVE);
     softPwmWrite(RIGHT_MOTOR_PIN2, 0);
-    printf("[Action] Moving Forward\n");
+    //printf("[Action] Moving Forward\n");
 }
 
 // 우회전
 void turn_Right() {
     // 우회전 전 정지
-    stop_Moving();
-    delay(100);
+    // stop_Moving();
     // 제자리 우회전 (탱크 턴): 왼쪽 전진, 오른쪽 후진
     softPwmWrite(LEFT_MOTOR_PIN1, SPEED_TURN);
     softPwmWrite(LEFT_MOTOR_PIN2, 0);
     
     softPwmWrite(RIGHT_MOTOR_PIN1, 0);
     softPwmWrite(RIGHT_MOTOR_PIN2, SPEED_TURN);
-    printf("[Action] Turning Right\n");
+    //printf("[Action] Turning Right\n");
 }
 
 // 좌회전
 void turn_Left() {
     // 좌회전 전 정지
-    stop_Moving();
-    delay(100);
+    // stop_Moving();
     // 제자리 좌회전: 왼쪽 후진, 오른쪽 전진
     softPwmWrite(LEFT_MOTOR_PIN1, 0);
     softPwmWrite(LEFT_MOTOR_PIN2, SPEED_TURN);
     
     softPwmWrite(RIGHT_MOTOR_PIN1, SPEED_TURN);
     softPwmWrite(RIGHT_MOTOR_PIN2, 0);
-    printf("[Action] Turning Left\n");
+    //printf("[Action] Turning Left\n");
 }
 
 // 2. 브러쉬 제어 함수 (On/Off)
@@ -103,11 +100,11 @@ void control_Brush(int state) {
     if (state == 1) {
         softPwmWrite(BRUSH_PIN_L, SPEED_BRUSH);
         softPwmWrite(BRUSH_PIN_R, SPEED_BRUSH);
-        printf("[Brush] ON\n");
+        //printf("[Brush] ON\n");
     } else {
         softPwmWrite(BRUSH_PIN_L, 0);
         softPwmWrite(BRUSH_PIN_R, 0);
-        printf("[Brush] OFF\n");
+        //printf("[Brush] OFF\n");
     }
 }
 
@@ -118,10 +115,10 @@ void control_Suction(int state) {
         // 흡입 모터는 초기 기동 전류가 높으므로 서서히 올리는 것(Soft Start)이 좋을 수 있음
         // 여기서는 단순 On으로 구현
         softPwmWrite(SUCTION_PIN, SPEED_SUCTION);
-        printf("[Suction] ON\n");
+        //printf("[Suction] ON\n");
     } else {
         softPwmWrite(SUCTION_PIN, 0);
-        printf("[Suction] OFF\n");
+        //printf("[Suction] OFF\n");
     }
 }
 
@@ -139,27 +136,27 @@ void force_Stop_All() {
     // 3. 흡입 모터 0 설정
     softPwmWrite(SUCTION_PIN, 0);
 
-    printf("[System] All Pins set to 0 (STOP)\n");
+    //printf("[System] All Pins set to 0 (STOP)\n");
 }
 
-// ================= 메인 함수 =================
+/* 모터 테스트용 코드
 int main() {
     if (wiringPiSetupGpio() == -1) {
-        printf("WiringPi setup failed!\n");
+        //printf("WiringPi setup failed!\n");
         return 1;
     }
 
     motor_Init();
     force_Stop_All();
-    printf("Cleaning Robot Control Ready.\n");
-    printf("Keys: w(Forward), a(Left), d(Right), s(Stop), b(Brush Toggle), v(Suction Toggle), q(Quit)\n");
+    //printf("Cleaning Robot Control Ready.\n");
+    //printf("Keys: w(Forward), a(Left), d(Right), s(Stop), b(Brush Toggle), v(Suction Toggle), q(Quit)\n");
 
     char cmd;
     int brush_state = 0;
     int suction_state = 0;
 
     while (1) {
-        printf("Command: ");
+        //printf("Command: ");
         scanf(" %c", &cmd);
 
         switch (cmd) {
@@ -182,14 +179,73 @@ int main() {
                 stop_Moving();
                 control_Brush(0);
                 control_Suction(0);
-                printf("Program Exit.\n");
+                //printf("Program Exit.\n");
                 return 0;
 
             default:
-                printf("Invalid Command.\n");
+                //printf("Invalid Command.\n");
                 break;
         }
     }
 
     return 0;
+}
+*/
+
+void* motors(void *arg) {
+    /*
+    if (wiringPiSetupGpio() == -1) {
+        printf("WiringPi setup failed!\n");
+        return 1;
+    }
+    */
+    int motor_power;
+    int motor_movement;
+
+    motor_Init();
+    force_Stop_All();
+    printf("Cleaning Robot Control Ready.\n");
+    // 공유변수를 계속 읽어들임
+    while (1) {
+        // MOTOR_POWER 확인
+        pthread_mutex_lock(&shared_lock);
+        motor_power = MOTOR_POWER;
+        pthread_mutex_unlock(&shared_lock);
+
+        // MOTOR_POWER가 1일 때(작동 중) 명령 받기
+        if (motor_power == 1)
+        {
+            control_Brush(1);
+            control_Suction(1);
+            
+            // MOTOR_MOVE 확인
+            pthread_mutex_lock(&shared_lock);
+            motor_movement = MOTOR_MOVEMENT;
+            pthread_mutex_unlock(&shared_lock);
+            switch (motor_movement)
+            {
+            case 0:
+                stop_Moving();
+                break;
+            case 1:
+                move_Forward();
+                break;
+            case 2:
+                turn_Right();
+                break;
+            case 3:
+                turn_Left();
+                break;
+            default:
+                break;
+            }
+        }
+        // MOTOR_POWER가 0일 때(작동 중이 아닐 때) 명령이 들어오더라도 패스
+        else{
+            force_Stop_All();
+            delay(10);
+            continue;
+        }
+        delay(10);
+    }
 }
