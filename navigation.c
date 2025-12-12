@@ -85,7 +85,7 @@ void *navigate(void *arg)
         }
         // [상황 1] 정면에 장애물 감지 (긴급 회피)
         // 추후 수정 필요 : 센서 값 기준, 단위(현재 cm)
-        if (local_center <= 3.0f)
+        if (local_center <= 10.0f)
         {
             // 1. 일단 정지
             // stop_Moving();
