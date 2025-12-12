@@ -8,18 +8,19 @@
 // 사용하시는 모터 드라이버 배선에 맞춰 번호를 수정하세요.
 
 // 1. 바퀴 (기어박스) 모터 - L298N 같은 드라이버 사용 가정
-#define LEFT_MOTOR_PIN1  19
-#define LEFT_MOTOR_PIN2  13
-#define RIGHT_MOTOR_PIN1 14
-#define RIGHT_MOTOR_PIN2 15
+#define LEFT_MOTOR_PIN1  14
+#define LEFT_MOTOR_PIN2  15
+#define RIGHT_MOTOR_PIN1 2
+#define RIGHT_MOTOR_PIN2 3
 
-// 2. 브러쉬 모터 (2개) - 핀 하나로 같이 제어하거나 각각 제어
-// (여기서는 각각의 핀이 있다고 가정하되, 함수에서는 동시에 켭니다)
-#define BRUSH_PIN_L      6
-#define BRUSH_PIN_R      25
+// 2. 브러쉬 모터 (2개) - 각각 2핀으로 제어 (바퀴 모터와 동일 방식)
+#define BRUSH_PIN_L1     20
+#define BRUSH_PIN_L2     21
+#define BRUSH_PIN_R1     8
+#define BRUSH_PIN_R2     9
 
 // 3. 흡입 모터 (1개) - MOSFET 모듈 등을 사용 가정
-#define SUCTION_PIN      12 
+#define SUCTION_PIN      26
 
 // ================= 설정 상수 =================
 #define SPEED_MOVE     13   // 바퀴 이동 속도 (0~100)
@@ -38,8 +39,10 @@ void motor_Init() {
     softPwmCreate(RIGHT_MOTOR_PIN1, 0, 100);
     softPwmCreate(RIGHT_MOTOR_PIN2, 0, 100);
     
-    softPwmCreate(BRUSH_PIN_L, 0, 100);
-    softPwmCreate(BRUSH_PIN_R, 0, 100);
+    softPwmCreate(BRUSH_PIN_L1, 0, 100);
+    softPwmCreate(BRUSH_PIN_L2, 0, 100);
+    softPwmCreate(BRUSH_PIN_R1, 0, 100);
+    softPwmCreate(BRUSH_PIN_R2, 0, 100);
     
     softPwmCreate(SUCTION_PIN, 0, 100);
 }
@@ -98,12 +101,18 @@ void turn_Left() {
 // state: 1 = 켜기, 0 = 끄기
 void control_Brush(int state) {
     if (state == 1) {
-        softPwmWrite(BRUSH_PIN_L, SPEED_BRUSH);
-        softPwmWrite(BRUSH_PIN_R, SPEED_BRUSH);
+        // 왼쪽 브러쉬 회전
+        softPwmWrite(BRUSH_PIN_L1, SPEED_BRUSH);
+        softPwmWrite(BRUSH_PIN_L2, 0);
+        // 오른쪽 브러쉬 회전
+        softPwmWrite(BRUSH_PIN_R1, 0);
+        softPwmWrite(BRUSH_PIN_R2, SPEED_BRUSH);
         //printf("[Brush] ON\n");
     } else {
-        softPwmWrite(BRUSH_PIN_L, 0);
-        softPwmWrite(BRUSH_PIN_R, 0);
+        softPwmWrite(BRUSH_PIN_L1, 0);
+        softPwmWrite(BRUSH_PIN_L2, 0);
+        softPwmWrite(BRUSH_PIN_R1, 0);
+        softPwmWrite(BRUSH_PIN_R2, 0);
         //printf("[Brush] OFF\n");
     }
 }
@@ -130,8 +139,10 @@ void force_Stop_All() {
     softPwmWrite(RIGHT_MOTOR_PIN2, 0);
 
     // 2. 브러쉬 모터 0 설정
-    softPwmWrite(BRUSH_PIN_L, 0);
-    softPwmWrite(BRUSH_PIN_R, 0);
+    softPwmWrite(BRUSH_PIN_L1, 0);
+    softPwmWrite(BRUSH_PIN_L2, 0);
+    softPwmWrite(BRUSH_PIN_R1, 0);
+    softPwmWrite(BRUSH_PIN_R2, 0);
 
     // 3. 흡입 모터 0 설정
     softPwmWrite(SUCTION_PIN, 0);
