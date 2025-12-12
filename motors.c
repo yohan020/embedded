@@ -10,8 +10,8 @@
 // 1. 바퀴 (기어박스) 모터 - L298N 같은 드라이버 사용 가정
 #define LEFT_MOTOR_PIN1  14
 #define LEFT_MOTOR_PIN2  15
-#define RIGHT_MOTOR_PIN1 2
-#define RIGHT_MOTOR_PIN2 3
+#define RIGHT_MOTOR_PIN1 3
+#define RIGHT_MOTOR_PIN2 2
 
 // 2. 브러쉬 모터 (2개) - 각각 2핀으로 제어 (바퀴 모터와 동일 방식)
 #define BRUSH_PIN_L1     20
@@ -23,10 +23,10 @@
 #define SUCTION_PIN      26
 
 // ================= 설정 상수 =================
-#define SPEED_MOVE     13   // 바퀴 이동 속도 (0~100)
-#define SPEED_TURN     13   // 회전 시 속도 (0~100)
+#define SPEED_MOVE     70   // 바퀴 이동 속도 (0~100)
+#define SPEED_TURN     70   // 회전 시 속도 (0~100)
 #define SPEED_BRUSH    13  // 브러쉬 속도 (일정하게 돎)
-#define SPEED_SUCTION  13  // 흡입 모터 속도 (최대)
+#define SPEED_SUCTION  80  // 흡입 모터 속도 (최대)
 
 // ================= 초기화 함수 =================
 void motor_Init() {
@@ -45,6 +45,8 @@ void motor_Init() {
     softPwmCreate(BRUSH_PIN_R2, 0, 100);
     
     softPwmCreate(SUCTION_PIN, 0, 100);
+    
+    printf("[모터 준비]\n");
 }
 
 // ================= 기능별 함수 구현 =================
@@ -57,7 +59,7 @@ void stop_Moving() {
     softPwmWrite(LEFT_MOTOR_PIN2, 0);
     softPwmWrite(RIGHT_MOTOR_PIN1, 0);
     softPwmWrite(RIGHT_MOTOR_PIN2, 0);
-    //printf("[Action] Stop Moving\n");
+    printf("[정지]\n");
 }
 
 // 전진
@@ -68,7 +70,7 @@ void move_Forward() {
     // 오른쪽 전진
     softPwmWrite(RIGHT_MOTOR_PIN1, SPEED_MOVE);
     softPwmWrite(RIGHT_MOTOR_PIN2, 0);
-    //printf("[Action] Moving Forward\n");
+    printf("[전진]\n");
 }
 
 // 우회전
@@ -81,7 +83,7 @@ void turn_Right() {
     
     softPwmWrite(RIGHT_MOTOR_PIN1, 0);
     softPwmWrite(RIGHT_MOTOR_PIN2, SPEED_TURN);
-    //printf("[Action] Turning Right\n");
+    printf("[우회전]\n");
 }
 
 // 좌회전
@@ -94,7 +96,7 @@ void turn_Left() {
     
     softPwmWrite(RIGHT_MOTOR_PIN1, SPEED_TURN);
     softPwmWrite(RIGHT_MOTOR_PIN2, 0);
-    //printf("[Action] Turning Left\n");
+    printf("[좌회전]\n");
 }
 
 // 2. 브러쉬 제어 함수 (On/Off)
@@ -107,13 +109,13 @@ void control_Brush(int state) {
         // 오른쪽 브러쉬 회전
         softPwmWrite(BRUSH_PIN_R1, 0);
         softPwmWrite(BRUSH_PIN_R2, SPEED_BRUSH);
-        //printf("[Brush] ON\n");
+        printf("[브러쉬] ON\n");
     } else {
         softPwmWrite(BRUSH_PIN_L1, 0);
         softPwmWrite(BRUSH_PIN_L2, 0);
         softPwmWrite(BRUSH_PIN_R1, 0);
         softPwmWrite(BRUSH_PIN_R2, 0);
-        //printf("[Brush] OFF\n");
+        printf("[브러쉬] OFF\n");
     }
 }
 
@@ -124,10 +126,10 @@ void control_Suction(int state) {
         // 흡입 모터는 초기 기동 전류가 높으므로 서서히 올리는 것(Soft Start)이 좋을 수 있음
         // 여기서는 단순 On으로 구현
         softPwmWrite(SUCTION_PIN, SPEED_SUCTION);
-        //printf("[Suction] ON\n");
+        printf("[흡입기] ON\n");
     } else {
         softPwmWrite(SUCTION_PIN, 0);
-        //printf("[Suction] OFF\n");
+        printf("[흡입기] OFF\n");
     }
 }
 
@@ -147,7 +149,7 @@ void force_Stop_All() {
     // 3. 흡입 모터 0 설정
     softPwmWrite(SUCTION_PIN, 0);
 
-    //printf("[System] All Pins set to 0 (STOP)\n");
+    printf("[모두 정지]\n");
 }
 
 /* 모터 테스트용 코드
