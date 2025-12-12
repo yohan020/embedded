@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>INDEX</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/record.css') }}">
+</head>
+<body>
+    <div class="video-container">
+        <img src="{{ url_for('video_feed') }}" width="640">
+    </div>
+
+    <div class="recorder-container">
+        <input type="checkbox" id="btn">
+        <label for="btn" class="record-label">
+			<div class="time">
+                <div class="h_m"></div>
+                <div class="s_ms"></div>
+			</div>
+		</label>
+    </div>
+
+    <script>
+        const btn = document.getElementById('btn');
+
+        btn.addEventListener('change', function() {
+            const status = this.checked;
+
+            fetch('/toggle_record', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: status })
+            })
+            .then(res => res.json())
+            .then(data => console.log("REC Status:", data.status));
+        });
+    </script>
+</body>
+</html>
