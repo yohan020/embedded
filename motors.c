@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <wiringPi.h>
+#include <softPwm.h>
 #include "motors.h"
 
 // 커밋 테스트
@@ -70,7 +72,7 @@ void move_Forward() {
     // 오른쪽 전진
     softPwmWrite(RIGHT_MOTOR_PIN1, SPEED_MOVE);
     softPwmWrite(RIGHT_MOTOR_PIN2, 0);
-    printf("[전진]\n");
+    printf("[전진중...]\n");
 }
 
 // 우회전
@@ -83,7 +85,7 @@ void turn_Right() {
     
     softPwmWrite(RIGHT_MOTOR_PIN1, 0);
     softPwmWrite(RIGHT_MOTOR_PIN2, SPEED_TURN);
-    printf("[우회전]\n");
+    printf("[우회전중...]\n");
 }
 
 // 좌회전
@@ -96,7 +98,7 @@ void turn_Left() {
     
     softPwmWrite(RIGHT_MOTOR_PIN1, SPEED_TURN);
     softPwmWrite(RIGHT_MOTOR_PIN2, 0);
-    printf("[좌회전]\n");
+    printf("[좌회전중...]\n");
 }
 
 // 2. 브러쉬 제어 함수 (On/Off)
