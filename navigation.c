@@ -14,7 +14,7 @@
 
 // ================= 설정 상수 =================
 #define DIST_HYPOTENUSE_THRESHOLD 30.0f // 대각선 거리 경계값 (cm) - 이보다 작으면 벽으로 간주
-#define TURN_DELAY_MS 50                // 회전 시 동작 시간 (ms)
+#define TURN_DELAY_MS 1000              // 회전 시 동작 시간 (ms)
 #define LOOP_DELAY_MS 50                // 루프 주기 (ms)
 
 // ================= 외부 변수 참조 =================
@@ -145,7 +145,7 @@ void *navigate(void *arg)
                 pthread_mutex_unlock(&shared_lock);
 
                 // turn_Left();
-                delay(300); // 약간만 회전하여 경로 수정
+                delay(800); // 약간만 회전하여 경로 수정
             }
             else
             {
@@ -154,7 +154,7 @@ void *navigate(void *arg)
                 pthread_mutex_unlock(&shared_lock);
 
                 // turn_Right();
-                delay(300);
+                delay(800);
             }
 
             // 다시 전진 준비
