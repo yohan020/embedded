@@ -136,6 +136,25 @@ void control_Suction(int state) {
 }
 
 void force_Stop_All() {
+    // 1. 바퀴 모터 0 설정
+    softPwmWrite(LEFT_MOTOR_PIN1, 0);
+    softPwmWrite(LEFT_MOTOR_PIN2, 0);
+    softPwmWrite(RIGHT_MOTOR_PIN1, 0);
+    softPwmWrite(RIGHT_MOTOR_PIN2, 0);
+
+    // 2. 브러쉬 모터 0 설정
+    softPwmWrite(BRUSH_PIN_L1, 0);
+    softPwmWrite(BRUSH_PIN_L2, 0);
+    softPwmWrite(BRUSH_PIN_R1, 0);
+    softPwmWrite(BRUSH_PIN_R2, 0);
+
+    // 3. 흡입 모터 0 설정
+    softPwmWrite(SUCTION_PIN, 0);
+
+    printf("[모두 정지]\n");
+}
+
+void force_Stop_All_Init() {
     // softPwm 스레드를 먼저 정지시킨 후 LOW 설정
     
     // 1. 바퀴 모터 PWM 정지 후 LOW
@@ -231,7 +250,7 @@ void* motors(void *arg) {
     int motor_movement;
 
     motor_Init();
-    force_Stop_All();
+    force_Stop_All_Init();
     printf("Cleaning Robot Control Ready.\n");
     // 공유변수를 계속 읽어들임
     while (1) {
