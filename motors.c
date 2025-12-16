@@ -136,19 +136,32 @@ void control_Suction(int state) {
 }
 
 void force_Stop_All() {
-    // 1. 바퀴 모터 강제 LOW
+    // softPwm 스레드를 먼저 정지시킨 후 LOW 설정
+    
+    // 1. 바퀴 모터 PWM 정지 후 LOW
+    softPwmStop(LEFT_MOTOR_PIN1);
+    softPwmStop(LEFT_MOTOR_PIN2);
+    softPwmStop(RIGHT_MOTOR_PIN1);
+    softPwmStop(RIGHT_MOTOR_PIN2);
+    
     digitalWrite(LEFT_MOTOR_PIN1, LOW);
     digitalWrite(LEFT_MOTOR_PIN2, LOW);
     digitalWrite(RIGHT_MOTOR_PIN1, LOW);
     digitalWrite(RIGHT_MOTOR_PIN2, LOW);
 
-    // 2. 브러쉬 모터 강제 LOW
+    // 2. 브러쉬 모터 PWM 정지 후 LOW
+    softPwmStop(BRUSH_PIN_L1);
+    softPwmStop(BRUSH_PIN_L2);
+    softPwmStop(BRUSH_PIN_R1);
+    softPwmStop(BRUSH_PIN_R2);
+    
     digitalWrite(BRUSH_PIN_L1, LOW);
     digitalWrite(BRUSH_PIN_L2, LOW);
     digitalWrite(BRUSH_PIN_R1, LOW);
     digitalWrite(BRUSH_PIN_R2, LOW);
 
-    // 3. 흡입 모터 강제 LOW
+    // 3. 흡입 모터 PWM 정지 후 LOW
+    softPwmStop(SUCTION_PIN);
     digitalWrite(SUCTION_PIN, LOW);
 
     printf("[모두 정지]\n");
