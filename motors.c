@@ -289,7 +289,7 @@ void* motors(void *arg) {
         }
         // MOTOR_POWER가 0일 때(작동 중이 아닐 때) 명령이 들어오더라도 패스
         else{
-            force_Stop_All_Init();
+            force_Stop_All();
             delay(10);
             continue;
         }
