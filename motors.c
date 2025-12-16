@@ -18,8 +18,8 @@
 // 2. 브러쉬 모터 (2개) - 각각 2핀으로 제어 (바퀴 모터와 동일 방식)
 #define BRUSH_PIN_L1     20
 #define BRUSH_PIN_L2     21
-#define BRUSH_PIN_R1     8
-#define BRUSH_PIN_R2     9
+#define BRUSH_PIN_R1     7
+#define BRUSH_PIN_R2     8
 
 // 3. 흡입 모터 (1개) - MOSFET 모듈 등을 사용 가정
 #define SUCTION_PIN      26
@@ -289,7 +289,7 @@ void* motors(void *arg) {
         }
         // MOTOR_POWER가 0일 때(작동 중이 아닐 때) 명령이 들어오더라도 패스
         else{
-            force_Stop_All();
+            force_Stop_All_Init();
             delay(10);
             continue;
         }
