@@ -13,7 +13,7 @@
 // 전면 센서 값의 기준 설정 필요
 
 // ================= 설정 상수 =================
-#define DIST_HYPOTENUSE_THRESHOLD 30.0f // 대각선 거리 경계값 (cm) - 이보다 작으면 벽으로 간주
+#define DIST_HYPOTENUSE_THRESHOLD 50.0f // 대각선 거리 경계값 (cm) - 이보다 작으면 벽으로 간주
 #define TURN_DELAY_MS 1000              // 회전 시 동작 시간 (ms)
 #define LOOP_DELAY_MS 50                // 루프 주기 (ms)
 
