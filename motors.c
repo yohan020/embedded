@@ -136,20 +136,20 @@ void control_Suction(int state) {
 }
 
 void force_Stop_All() {
-    // 1. 바퀴 모터 0 설정
-    softPwmWrite(LEFT_MOTOR_PIN1, 0);
-    softPwmWrite(LEFT_MOTOR_PIN2, 0);
-    softPwmWrite(RIGHT_MOTOR_PIN1, 0);
-    softPwmWrite(RIGHT_MOTOR_PIN2, 0);
+    // 1. 바퀴 모터 강제 LOW
+    digitalWrite(LEFT_MOTOR_PIN1, LOW);
+    digitalWrite(LEFT_MOTOR_PIN2, LOW);
+    digitalWrite(RIGHT_MOTOR_PIN1, LOW);
+    digitalWrite(RIGHT_MOTOR_PIN2, LOW);
 
-    // 2. 브러쉬 모터 0 설정
-    softPwmWrite(BRUSH_PIN_L1, 0);
-    softPwmWrite(BRUSH_PIN_L2, 0);
-    softPwmWrite(BRUSH_PIN_R1, 0);
-    softPwmWrite(BRUSH_PIN_R2, 0);
+    // 2. 브러쉬 모터 강제 LOW
+    digitalWrite(BRUSH_PIN_L1, LOW);
+    digitalWrite(BRUSH_PIN_L2, LOW);
+    digitalWrite(BRUSH_PIN_R1, LOW);
+    digitalWrite(BRUSH_PIN_R2, LOW);
 
-    // 3. 흡입 모터 0 설정
-    softPwmWrite(SUCTION_PIN, 0);
+    // 3. 흡입 모터 강제 LOW
+    digitalWrite(SUCTION_PIN, LOW);
 
     printf("[모두 정지]\n");
 }
