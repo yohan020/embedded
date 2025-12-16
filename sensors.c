@@ -65,16 +65,18 @@ void *sensor_thread(void *arg)
         float hypotenuse;
         if (l > 0 && r > 0 && c > 0)
         {
-            // 왼쪽 전방 대각선 벽까지의 수직 거리
-            float left_perp = ((15.0 + c) * (15.0 + l)) / sqrt((15.0 + c) * (15.0 + c) + (15.0 + l) * (15.0 + l));
+            // 왼쪽 전방 대각선 빗변 거리
+            float left_hyp = sqrt((17.0 + c) * (17.0 + c) + (17.0 + l) * (17.0 + l));
 
-            // 오른쪽 전방 대각선 벽까지의 수직 거리
-            float right_perp = ((15.0 + c) * (15.0 + r)) / sqrt((15.0 + c) * (15.0 + c) + (15.0 + r) * (15.0 + r));
+            // 오른쪽 전방 대각선 빗변 거리
+            float right_hyp = sqrt((17.0 + c) * (17.0 + c) + (17.0 + r) * (17.0 + r));
 
             // 둘 중 작은 값 = 더 가까운 대각선 벽
-            float min_perp = (left_perp < right_perp) ? left_perp : right_perp;
-
-            hypotenuse = min_perp;
+            if (left_hyp < right_hyp) {
+                hypotenuse = left_hyp;
+            } else {
+                hypotenuse = right_hyp;
+            }
         }
         else
         {
