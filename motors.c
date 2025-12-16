@@ -249,8 +249,8 @@ void* motors(void *arg) {
     int motor_power;
     int motor_movement;
 
-    motor_Init();
     force_Stop_All_Init();
+    motor_Init();
     printf("Cleaning Robot Control Ready.\n");
     // 공유변수를 계속 읽어들임
     while (1) {
