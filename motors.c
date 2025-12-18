@@ -22,13 +22,14 @@
 #define BRUSH_PIN_R2     8
 
 // 3. 흡입 모터 (1개) - MOSFET 모듈 등을 사용 가정
-#define SUCTION_PIN      26
+// #define SUCTION_PIN      26
+#define SUCTION_PIN      12
 
 // ================= 설정 상수 =================
 #define SPEED_MOVE     70   // 바퀴 이동 속도 (0~100)
 #define SPEED_TURN     70   // 회전 시 속도 (0~100)
-#define SPEED_BRUSH    13  // 브러쉬 속도 (일정하게 돎)
-#define SPEED_SUCTION  80  // 흡입 모터 속도 (최대)
+#define SPEED_BRUSH    50  // 브러쉬 속도 (일정하게 돎)
+#define SPEED_SUCTION  99  // 흡입 모터 속도 (최대)
 
 // ================= 초기화 함수 =================
 void motor_Init() {
@@ -46,7 +47,12 @@ void motor_Init() {
     softPwmCreate(BRUSH_PIN_R1, 0, 100);
     softPwmCreate(BRUSH_PIN_R2, 0, 100);
     
-    softPwmCreate(SUCTION_PIN, 0, 100);
+    //softPwmCreate(SUCTION_PIN, 0, 100);
+    pinMode(SUCTION_PIN, PWM_OUTPUT);
+    pwmSetMode(PWM_MODE_MS);
+    pwmSetRange(100);
+    pwmSetClock(192); // 19.2kHz
+    pwmWrite(SUCTION_PIN, 0);
     
     printf("[모터 준비]\n");
 }
@@ -127,10 +133,12 @@ void control_Suction(int state) {
     if (state == 1) {
         // 흡입 모터는 초기 기동 전류가 높으므로 서서히 올리는 것(Soft Start)이 좋을 수 있음
         // 여기서는 단순 On으로 구현
-        softPwmWrite(SUCTION_PIN, SPEED_SUCTION);
+        //softPwmWrite(SUCTION_PIN, SPEED_SUCTION);
+        pwmWrite(SUCTION_PIN, SPEED_SUCTION);
         printf("[흡입기] ON\n");
     } else {
-        softPwmWrite(SUCTION_PIN, 0);
+        //softPwmWrite(SUCTION_PIN, 0);
+        pwmWrite(SUCTION_PIN, 0);
         printf("[흡입기] OFF\n");
     }
 }
@@ -149,7 +157,8 @@ void force_Stop_All() {
     softPwmWrite(BRUSH_PIN_R2, 0);
 
     // 3. 흡입 모터 0 설정
-    softPwmWrite(SUCTION_PIN, 0);
+    //softPwmWrite(SUCTION_PIN, 0);
+    pwmWrite(SUCTION_PIN, 0);
 
     printf("[모두 정지]\n");
 }
@@ -180,64 +189,12 @@ void force_Stop_All_Init() {
     digitalWrite(BRUSH_PIN_R2, LOW);
 
     // 3. 흡입 모터 PWM 정지 후 LOW
-    softPwmStop(SUCTION_PIN);
+    //softPwmStop(SUCTION_PIN);
+    pinMode(SUCTION_PIN, OUTPUT);
     digitalWrite(SUCTION_PIN, LOW);
 
     printf("[모두 정지]\n");
 }
-
-/* 모터 테스트용 코드
-int main() {
-    if (wiringPiSetupGpio() == -1) {
-        //printf("WiringPi setup failed!\n");
-        return 1;
-    }
-
-    motor_Init();
-    force_Stop_All();
-    //printf("Cleaning Robot Control Ready.\n");
-    //printf("Keys: w(Forward), a(Left), d(Right), s(Stop), b(Brush Toggle), v(Suction Toggle), q(Quit)\n");
-
-    char cmd;
-    int brush_state = 0;
-    int suction_state = 0;
-
-    while (1) {
-        //printf("Command: ");
-        scanf(" %c", &cmd);
-
-        switch (cmd) {
-            case 'w': move_Forward(); break;
-            case 'a': turn_Left(); break;
-            case 'd': turn_Right(); break;
-            case 's': stop_Moving(); break;
-            
-            case 'b': // 브러쉬 토글
-                brush_state = !brush_state;
-                control_Brush(brush_state);
-                break;
-
-            case 'v': // 흡입 토글
-                suction_state = !suction_state;
-                control_Suction(suction_state);
-                break;
-
-            case 'q': // 종료
-                stop_Moving();
-                control_Brush(0);
-                control_Suction(0);
-                //printf("Program Exit.\n");
-                return 0;
-
-            default:
-                //printf("Invalid Command.\n");
-                break;
-        }
-    }
-
-    return 0;
-}
-*/
 
 void* motors(void *arg) {
     /*
