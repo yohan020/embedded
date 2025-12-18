@@ -205,6 +205,7 @@ void* motors(void *arg) {
     */
     int motor_power;
     int motor_movement;
+    int prev_motor_movement = -1;  // 이전 상태 저장 (초기값 -1)
 
     force_Stop_All_Init();
     motor_Init();
@@ -226,27 +227,34 @@ void* motors(void *arg) {
             pthread_mutex_lock(&shared_lock);
             motor_movement = MOTOR_MOVEMENT;
             pthread_mutex_unlock(&shared_lock);
-            switch (motor_movement)
+            
+            // 상태가 변경되었을 때만 동작 함수 호출
+            if (motor_movement != prev_motor_movement)
             {
-            case 0:
-                stop_Moving();
-                break;
-            case 1:
-                move_Forward();
-                break;
-            case 2:
-                turn_Right();
-                break;
-            case 3:
-                turn_Left();
-                break;
-            default:
-                break;
+                switch (motor_movement)
+                {
+                case 0:
+                    stop_Moving();
+                    break;
+                case 1:
+                    move_Forward();
+                    break;
+                case 2:
+                    turn_Right();
+                    break;
+                case 3:
+                    turn_Left();
+                    break;
+                default:
+                    break;
+                }
+                prev_motor_movement = motor_movement;  // 상태 업데이트
             }
         }
         // MOTOR_POWER가 0일 때(작동 중이 아닐 때) 명령이 들어오더라도 패스
         else{
             force_Stop_All();
+            prev_motor_movement = -1;  // 상태 리셋
             delay(10);
             continue;
         }
