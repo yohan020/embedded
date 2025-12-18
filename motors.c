@@ -50,8 +50,8 @@ void motor_Init() {
     //softPwmCreate(SUCTION_PIN, 0, 100);
     pinMode(SUCTION_PIN, PWM_OUTPUT);
     pwmSetMode(PWM_MODE_MS);
-    pwmSetRange(100);
-    pwmSetClock(192); // 19.2kHz
+    pwmSetRange(1000);  // 세밀한 제어 및 고주파 PWM을 위해 1000으로 설정
+    pwmSetClock(96);    // 19.2MHz ÷ 96 ÷ 1000 = 20kHz (모터 최적 주파수)
     pwmWrite(SUCTION_PIN, 0);
     
     printf("[모터 준비]\n");
@@ -134,8 +134,8 @@ void control_Suction(int state) {
         // 흡입 모터는 초기 기동 전류가 높으므로 서서히 올리는 것(Soft Start)이 좋을 수 있음
         // 여기서는 단순 On으로 구현
         //softPwmWrite(SUCTION_PIN, SPEED_SUCTION);
-        pwmWrite(SUCTION_PIN, SPEED_SUCTION);
-        printf("[흡입기] ON\n");
+        pwmWrite(SUCTION_PIN, 1000);  // 100% 듀티비 (range 1000 기준)
+        printf("[흡입기] ON (Full Power 20kHz)\n");
     } else {
         //softPwmWrite(SUCTION_PIN, 0);
         pwmWrite(SUCTION_PIN, 0);
