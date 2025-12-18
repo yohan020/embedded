@@ -23,7 +23,7 @@
 
 // 3. 흡입 모터 (1개) - MOSFET 모듈 등을 사용 가정
 // #define SUCTION_PIN      26
-#define SUCTION_PIN      12
+#define SUCTION_PIN      32
 
 // ================= 설정 상수 =================
 #define SPEED_MOVE     70   // 바퀴 이동 속도 (0~100)
