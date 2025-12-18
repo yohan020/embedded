@@ -18,8 +18,7 @@ extern float SHARED_DIST_CENTER;
 extern float SHARED_DIST_RIGHT;
 extern float SHARED_DIST_HYPOTENUSE;
 
-// 3. 동시 접근 충돌 방지를 위한 뮤텍스 (선택 사항이지만 추천)
-extern pthread_mutex_t sensor_lock;
+extern pthread_mutex_t shared_lock;
 
 // 4. 스레드 함수 선언
 void *sensor_thread(void *arg);
