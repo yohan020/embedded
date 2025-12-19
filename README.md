@@ -42,9 +42,13 @@
 
 ## 빌드 및 실행 방법
 - C 언어 파일 실행 코드
-  - gcc -o robot_car main.c bluetooth.c sensors.c motors.c navigator.c -lwiringPi -lpthread -lm
+```
+gcc -o robot_car main.c bluetooth.c sensors.c motors.c navigator.c -lwiringPi -lpthread -lm
+```
 - 파이썬 실행 코드
-  - python camera_streaming.py
+```
+python camera_streaming.py
+```
 ## 데모 영상
 - demo 폴더 내 영상 참조
 ## 문제점 및 해결 방안 / 한계
