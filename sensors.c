@@ -36,12 +36,9 @@ float measure_distance(int trigPin, int echoPin)
     return (endTime - startTime) / 58.0;
 }
 
-// 2. 센서 스레드 (백그라운드에서 계속 값 갱신)
+// 센서 스레드 (백그라운드에서 계속 값 갱신)
 void *sensor_thread(void *arg)
 {
-    // 핀 설정
-    // if (wiringPiSetupGpio() == -1) return NULL; // 이미 메인에서 했으면 생략 가능하지만 안전상
-
     pinMode(TRIG_LEFT, OUTPUT);
     pinMode(ECHO_LEFT, INPUT);
     pinMode(TRIG_CENTER, OUTPUT);
@@ -82,8 +79,8 @@ void *sensor_thread(void *arg)
         {
             hypotenuse = -1.0; // 측정 실패 표시
         }
-        // ★ 공유 변수 업데이트 (쓰기)
-        // main에서 읽는 도중에 값이 바뀌면 꼬일 수 있으니 lock을 겁니다.
+        // 공유 변수 업데이트 (쓰기)
+        // main에서 읽는 도중에 값이 바뀌면 꼬일 수 있으니 lock
         pthread_mutex_lock(&shared_lock);
         SHARED_DIST_LEFT = l;
         SHARED_DIST_CENTER = c;
@@ -91,7 +88,6 @@ void *sensor_thread(void *arg)
         SHARED_DIST_HYPOTENUSE = hypotenuse;
         pthread_mutex_unlock(&shared_lock);
 
-        // 너무 자주 측정하면 CPU 부하가 심하니 0.1초 쉼
         delay(100);
     }
     return NULL;
