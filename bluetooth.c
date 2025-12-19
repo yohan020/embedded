@@ -8,7 +8,7 @@
 #define BAUD_RATE 115200
 
 // 타임아웃 설정 (밀리초 단위, 예: 500ms = 0.5초)
-// 0.5초 동안 블루투스 신호가 없으면 정지합니다. 4번 5번에 꼽혀있음
+// 0.5초 동안 블루투스 신호가 없으면 정지. 4번 5번에 꼽혀있음
 
 #define SAFETY_TIMEOUT_MS 250 
 
@@ -37,15 +37,8 @@ void *bluetooth(void *arg) {
     int fd_serial;
     unsigned char dat;
     
-    // ★ 추가: 마지막 데이터 수신 시간을 기록할 변수
+    // 마지막 데이터 수신 시간을 기록할 변수
     unsigned int last_received_time; 
-
-    /*
-    if (wiringPiSetupGpio() < 0) {
-        perror("wiringPiSetupGpio failed");
-        return (void *)-1;
-    }
-    */
 
     if ((fd_serial = serialOpen(UART2_DEV, BAUD_RATE)) < 0) {
         printf("Unable to open serial device (%s).\n", UART2_DEV);
@@ -59,7 +52,7 @@ void *bluetooth(void *arg) {
 
     while (1) {
         if (serialDataAvail(fd_serial)) {
-            // ★ 중요: 데이터가 들어오면 수신 시간을 현재 시간으로 갱신
+            // 데이터가 들어오면 수신 시간을 현재 시간으로 갱신
             last_received_time = millis(); 
 
             dat = serialRead(fd_serial);
@@ -121,8 +114,8 @@ void *bluetooth(void *arg) {
             fflush(stdout);
         } 
         else {
-            // ★ 추가: 데이터가 수신되지 않을 때 타임아웃 체크
-            // (현재 시간 - 마지막 수신 시간)이 설정된 타임아웃보다 크면
+            // 데이터가 수신되지 않을 때 타임아웃 체크
+            // (현재 시간 - 마지막 수신 시간)이 설정된 타임아웃보다 큰 경우
             if (millis() - last_received_time > SAFETY_TIMEOUT_MS) {
                 int motor_movement;
                 int auto_mode;
@@ -140,9 +133,6 @@ void *bluetooth(void *arg) {
                     fflush(stdout);
                 }
                 last_received_time = millis();
-                // 타임아웃이 계속 발생할 때 last_received_time을 계속 갱신할지,
-                // 아니면 한 번 멈추고 다음 데이터가 올 때까지 기다릴지는 선택 사항입니다.
-                // 여기서는 다음 데이터가 올 때까지 기다리는 구조입니다.
             }
         }
         
