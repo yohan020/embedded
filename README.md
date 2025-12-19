@@ -39,6 +39,10 @@
 <img width="1960" height="1361" alt="image" src="https://github.com/user-attachments/assets/6108ebae-2080-407d-9a2e-13d1dfd8c005" />
 
 ## 빌드 및 실행 방법
+- C 언어 파일 실행 코드
+ - gcc -o robot_car main.c bluetooth.c sensors.c motors.c navigator.c -lwiringPi -lpthread -lm
+- 파이썬 실행 코드
+ - python camera_streaming.py
 ## 데모 영상
 - demo 폴더 내 영상 참조
 ## 문제점 및 해결 방안 / 한계
@@ -50,6 +54,8 @@
   - C언어를 통해서 구현하려고 하였지만 C언어로는 구현이 되지않음
   - 교내 wifi를 통해서 로컬망으로 스트리밍을 시도하였지만 네트워크 보안 문제로 불가능 하게됨
   - 해결법 : 파이썬으로 구현하였고 핫스팟을 통해 네트워크 문제 해결함
+- GPIO 출력 한계
+  - 라즈베리파이의 GPIO 출력은 3.3v가 최고인데 흡입모터의 최고 입력 신호 전압은 5v이기 때문에 흡입모터의 최고 성능을 내지는 못함
 ## 팀원 및 역할
 - 김재윤 : 회로도 설계, 하드웨어 및 외관 제작
 - 이요한 : 센서 및 블루투스 통신 부분 개발, 청소기 조종 어플 개발
