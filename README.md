@@ -9,7 +9,8 @@
 - 블루투스를 통한 청소기 제어
 
 ## 전체 시스템 구조
-<img width="1946" height="1380" alt="image" src="https://github.com/user-attachments/assets/50c5d84c-59c2-4edc-84d8-9d53fd0e8545" />
+<img width="2511" height="1332" alt="image" src="https://github.com/user-attachments/assets/c792c3f3-31a8-4462-a0e6-1cd842b717ee" />
+
 
 - 개발 언어 : C언어 및 파이썬
 - 라이브러리 : softpwm, wiringPi
@@ -36,13 +37,14 @@
     - 경로 계산 쓰레드에서 센서값을 이용해서 경로를 제어할 경우
   - 시스템 시작/종료 변수
     - 모터 제어 쓰레드에서 각종 모터를 제어할지 정할 경우
-<img width="1960" height="1361" alt="image" src="https://github.com/user-attachments/assets/6108ebae-2080-407d-9a2e-13d1dfd8c005" />
+<img width="2114" height="1127" alt="image" src="https://github.com/user-attachments/assets/a971e88a-5dce-4d37-9ecb-50900058cbe6" />
+
 
 ## 빌드 및 실행 방법
 - C 언어 파일 실행 코드
- - gcc -o robot_car main.c bluetooth.c sensors.c motors.c navigator.c -lwiringPi -lpthread -lm
+  - gcc -o robot_car main.c bluetooth.c sensors.c motors.c navigator.c -lwiringPi -lpthread -lm
 - 파이썬 실행 코드
- - python camera_streaming.py
+  - python camera_streaming.py
 ## 데모 영상
 - demo 폴더 내 영상 참조
 ## 문제점 및 해결 방안 / 한계
